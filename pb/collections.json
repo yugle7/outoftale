@@ -1,0 +1,1912 @@
+[
+    {
+        "id": "oc5afgpeetgtwzq",
+        "name": "username",
+        "type": "view",
+        "system": false,
+        "schema": [
+            {
+                "id": "i0a1gigg",
+                "name": "which",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "citkmvpv",
+                "name": "who",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": null,
+        "updateRule": null,
+        "deleteRule": null,
+        "options": {
+            "query": "SELECT who.id, which, who FROM (\n  SELECT 0 as id, name as which FROM which\n  ORDER BY RANDOM()\n  LIMIT 1) as which\nJOIN (\n  SELECT 0 as id, name as who FROM who\n  ORDER BY RANDOM()\n  LIMIT 1) as who\nON which.id = who.id"
+        }
+    },
+    {
+        "id": "o3t8y8r5ea8osdu",
+        "name": "which",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "fo7fiw5p",
+                "name": "name",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": null,
+        "updateRule": null,
+        "deleteRule": null,
+        "options": {}
+    },
+    {
+        "id": "9znp6b0e2nq8to8",
+        "name": "who",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "sovhrtel",
+                "name": "name",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": null,
+        "updateRule": null,
+        "deleteRule": null,
+        "options": {}
+    },
+    {
+        "id": "yoeo4eudm9oody9",
+        "name": "impacts",
+        "type": "view",
+        "system": false,
+        "schema": [
+            {
+                "id": "vt5z8pes",
+                "name": "impact",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            }
+        ],
+        "indexes": [],
+        "listRule": null,
+        "viewRule": null,
+        "createRule": null,
+        "updateRule": null,
+        "deleteRule": null,
+        "options": {
+            "query": "SELECT\n  id,\n  SUM(i) AS impact\nFROM (\n  SELECT\n    reviewer_id AS id,\n    (1 + (progress = 5)) AS i\n  FROM solutions\n  WHERE reviewer_id > ''\n  UNION ALL\n  SELECT\n    author_id AS id,\n    (5 + 10 * (status > 0) + 20 * (status = 5)) AS i\n  FROM problems\n  WHERE author_id > ''\n)\nGROUP BY id"
+        }
+    },
+    {
+        "id": "ryy5wmm5v6nr09l",
+        "name": "likes",
+        "type": "view",
+        "system": false,
+        "schema": [
+            {
+                "id": "hi4m44ys",
+                "name": "r0",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "wlscrdod",
+                "name": "r1",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "jvsgsl94",
+                "name": "r2",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "gv6epmex",
+                "name": "p0",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "hutesceb",
+                "name": "p1",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "qeqolrvu",
+                "name": "p2",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            }
+        ],
+        "indexes": [],
+        "listRule": null,
+        "viewRule": null,
+        "createRule": null,
+        "updateRule": null,
+        "deleteRule": null,
+        "options": {
+            "query": "SELECT\n  id,\n  SUM((1 - p) * (r = 0) * c) AS r0,\n  SUM((1 - p) * (r = 1) * c) AS r1,\n  SUM((1 - p) * (r = 2) * c) AS r2,\n  SUM(p * (r = 0) * c) AS p0,\n  SUM(p * (r = 1) * c) AS p1,\n  SUM(p * (r = 2) * c) AS p2\nFROM (\n  SELECT\n    id, p, r,\n    COUNT(*) AS c\n  FROM (\n    SELECT\n      problem_id AS id,\n      (progress = 5) AS p,\n      react as r\n    FROM solutions\n  )\n  GROUP BY id, p, r\n)\nGROUP BY id"
+        }
+    },
+    {
+        "id": "1etekjx96nfaszd",
+        "name": "steps",
+        "type": "view",
+        "system": false,
+        "schema": [
+            {
+                "id": "1n71wnfj",
+                "name": "s1",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "e0vjmxup",
+                "name": "s2",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "gxddp5lb",
+                "name": "s3",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "gnoneniz",
+                "name": "s4",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "ezf0gzat",
+                "name": "p1",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "7lkpb91r",
+                "name": "p2",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "yp6iijbs",
+                "name": "p3",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "isf4rccr",
+                "name": "p4",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            }
+        ],
+        "indexes": [],
+        "listRule": null,
+        "viewRule": null,
+        "createRule": null,
+        "updateRule": null,
+        "deleteRule": null,
+        "options": {
+            "query": "SELECT\n  id,\n  SUM((s > 0) * c) AS s1,\n  SUM((s > 1) * c) AS s2,\n  SUM((s > 2) * c) AS s3,\n  SUM((s > 3) * c) AS s4,\n  SUM(p * (s = 1) * c) AS p1,\n  SUM(p * (s = 2) * c) AS p2,\n  SUM(p * (s = 3) * c) AS p3,\n  SUM(p * (s = 4) * c) AS p4\nFROM (\n  SELECT\n    id, p, s,\n    COUNT(*) AS c\n  FROM (\n    SELECT\n      problem_id AS id,\n      (progress = 5) AS p,\n      MIN(4, step / 2) AS s\n    FROM solutions\n    WHERE step > 1\n  )\n  GROUP BY id, p, s\n)\nGROUP BY id"
+        }
+    },
+    {
+        "id": "lyfhfpwoteyvl0q",
+        "name": "solutions",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "tjih0mdk",
+                "name": "step",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "6oionmyn",
+                "name": "react",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "vxdrgkob",
+                "name": "author_id",
+                "type": "relation",
+                "system": false,
+                "required": true,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "pykgqc8n",
+                "name": "author",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "exkdf2ja",
+                "name": "problem_id",
+                "type": "relation",
+                "system": false,
+                "required": true,
+                "options": {
+                    "collectionId": "27rpm5hb2squrua",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "oxtc9aaq",
+                "name": "problem",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "yvboameb",
+                "name": "reviewer_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "tpfg6alo",
+                "name": "reviewer",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "0nwfmtno",
+                "name": "progress",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "yqvcny6y",
+                "name": "answer",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "4hz3adzb",
+                "name": "proof",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "nr0r8mwe",
+                "name": "changed",
+                "type": "date",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": "",
+                    "max": ""
+                }
+            },
+            {
+                "id": "yyu24xbn",
+                "name": "solution",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            }
+        ],
+        "indexes": [
+            "CREATE INDEX `idx_9b6GX5m` ON `solutions` (`author_id`)",
+            "CREATE INDEX `idx_EHj288d` ON `solutions` (`problem_id`)",
+            "CREATE INDEX `idx_AXRtcWx` ON `solutions` (`reviewer_id`)"
+        ],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "h2l5x29q56u7u5p",
+        "name": "friends",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "7sbzkaec",
+                "name": "profile_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "6govfx99",
+                "name": "user_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "g7a4zhd8g426mbq",
+        "name": "thoughts",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "rg9xqqzk",
+                "name": "discussion_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "ojt1o1k0yku0upo",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "qj7es5gl",
+                "name": "profile_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "get5lgip",
+                "name": "react",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "4xwo60sorrzjxii",
+        "name": "reacts",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "ohdsjdzq",
+                "name": "profile_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "zknbnijj",
+                "name": "react",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "e91ljaky",
+                "name": "message_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "uhi133mn6ewt4vh",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "vfqbfzlh",
+                "name": "talk_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "25xnr0p2tauj0gi",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "itlekurq",
+                "name": "chat_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "nr42ia36upj9zob",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "s5bkhyoqatb3tpu",
+        "name": "drafts",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "0zfbzwth",
+                "name": "title",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "ukz01li5",
+                "name": "condition",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "zjjk7vec",
+                "name": "notes",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "ncjjk0dc",
+                "name": "answer",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "mn8ibanu",
+                "name": "proof",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "kjyniklc",
+                "name": "categories",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "1v9szr6b",
+                "name": "editor_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "bo4fvrhy",
+                "name": "editor",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "gjdeqbwo",
+                "name": "problem_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "27rpm5hb2squrua",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "pelmk7uc",
+                "name": "1",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "7ztxs3la",
+                "name": "2",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "ck0iogcq",
+                "name": "like",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "qvpnq5hs",
+                "name": "changed",
+                "type": "date",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": "",
+                    "max": ""
+                }
+            },
+            {
+                "id": "mv1pzyvu",
+                "name": "applied",
+                "type": "bool",
+                "system": false,
+                "required": false,
+                "options": {}
+            },
+            {
+                "id": "s9a4bejq",
+                "name": "deleted",
+                "type": "bool",
+                "system": false,
+                "required": false,
+                "options": {}
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "kvv69uwydujndd4",
+        "name": "reviews",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "ny5u6owi",
+                "name": "solution_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "lyfhfpwoteyvl0q",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "ho4aepvv",
+                "name": "reviewer_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "zmoiqayt",
+                "name": "progress",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "izo7mfub",
+                "name": "solution",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "xgdykglty7qbum7",
+        "name": "positions",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "jlmfpyhw",
+                "name": "users",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "khxo995iyyy2lr8",
+        "name": "ratings",
+        "type": "view",
+        "system": false,
+        "schema": [
+            {
+                "id": "tynemidj",
+                "name": "position",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "z9gp3pl1",
+                "name": "rating",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            }
+        ],
+        "indexes": [],
+        "listRule": null,
+        "viewRule": null,
+        "createRule": null,
+        "updateRule": null,
+        "deleteRule": null,
+        "options": {
+            "query": "SELECT\n  id,\n  (ROW_NUMBER() OVER(ORDER BY -rating, changed)) AS position,\n  rating\nFROM (\n  SELECT\n    id,\n    SUM(weight) AS rating,\n    MAX(changed) AS changed\n  FROM (\n    SELECT\n      author_id AS id,\n      problem_id,\n      changed\n    FROM solutions\n    WHERE progress=5\n  ) AS s\n  INNER JOIN (\n    SELECT\n      id as problem_id,\n      weight\n    FROM problems\n    WHERE weight > 0\n  ) AS p\n  on p.problem_id = s.problem_id\n  GROUP BY id\n)"
+        }
+    },
+    {
+        "id": "ei9pgxln6nx97is",
+        "name": "applies",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "ze5bdbuu",
+                "name": "draft_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "s5bkhyoqatb3tpu",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "svi0funa",
+                "name": "profile_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "woxs09np",
+                "name": "react",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "uhi133mn6ewt4vh",
+        "name": "messages",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "qfgj4i9x",
+                "name": "text",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "5y3rizfo",
+                "name": "chat_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "nr42ia36upj9zob",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "dlby7k5o",
+                "name": "deleted",
+                "type": "bool",
+                "system": false,
+                "required": false,
+                "options": {}
+            },
+            {
+                "id": "ixzku1j3",
+                "name": "author_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "wajrtdn5",
+                "name": "author",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "c6qjin6u",
+                "name": "reply",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "qzpwj9mf",
+                "name": "1",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "3lv08equ",
+                "name": "2",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "zmhaoohj",
+                "name": "3",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "bjmn5jfc",
+                "name": "4",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "w5akcu0z",
+                "name": "5",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "mdpq58ep",
+                "name": "6",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        ],
+        "indexes": [
+            "CREATE INDEX `idx_ZUCJtAq` ON `messages` (`chat_id`)"
+        ],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "27rpm5hb2squrua",
+        "name": "problems",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "7zuzldby",
+                "name": "title",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "wcxarcuq",
+                "name": "condition",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "eh6rbrc3",
+                "name": "author_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "3nvxqvtx",
+                "name": "author",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "oc90u1la",
+                "name": "weight",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "qli7qudu",
+                "name": "categories",
+                "type": "json",
+                "system": false,
+                "required": true,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "phqewye9",
+                "name": "status",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "vpoydhiq",
+                "name": "proof",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "wv4sdmxf",
+                "name": "answer",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "ivu7qvka",
+                "name": "notes",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "8funtfpv",
+                "name": "1",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "eefsdhcb",
+                "name": "2",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "zyzw8liw",
+                "name": "changed",
+                "type": "date",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": "",
+                    "max": ""
+                }
+            },
+            {
+                "id": "gacmzwc9",
+                "name": "solutions",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "cfm5idc2",
+                "name": "drafts",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "vapsfbca",
+                "name": "like",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "hp8uoemd",
+                "name": "step",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "25xnr0p2tauj0gi",
+        "name": "talks",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "tn4ecsod",
+                "name": "profile_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "hsreaqyf",
+                "name": "chat_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "nr42ia36upj9zob",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": [
+                        "id"
+                    ]
+                }
+            },
+            {
+                "id": "ul7vh4gt",
+                "name": "user_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "165zum6q",
+                "name": "user",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "s12zdahb",
+                "name": "message_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "uhi133mn6ewt4vh",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "vetelnfq",
+                "name": "read",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "8hcpmb1q",
+                "name": "deleted",
+                "type": "bool",
+                "system": false,
+                "required": false,
+                "options": {}
+            }
+        ],
+        "indexes": [
+            "CREATE INDEX `idx_6jZl786` ON `talks` (`profile_id`)"
+        ],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "nr42ia36upj9zob",
+        "name": "chats",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "74nhmbna",
+                "name": "title",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "48wtxxfb",
+                "name": "sender_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "ghtlvsbj",
+                "name": "message",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "wahqq7wi",
+                "name": "type",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "s9gls4ws",
+                "name": "read",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "s8ph06kf",
+                "name": "sent",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "yogqleyd",
+                "name": "changed",
+                "type": "date",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": "",
+                    "max": ""
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "ojt1o1k0yku0upo",
+        "name": "discussions",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "kv9qth13",
+                "name": "title",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "eccqkdvm",
+                "name": "text",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "4hj3kwqe",
+                "name": "author_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "ty8jd6em",
+                "name": "author",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "lwcrblh2",
+                "name": "topic",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "suz8b2kb",
+                "name": "like",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "teeohchh",
+                "name": "1",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "zbf0emrk",
+                "name": "2",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "zssfrn1v",
+                "name": "changed",
+                "type": "date",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": "",
+                    "max": ""
+                }
+            },
+            {
+                "id": "ltlwjup0",
+                "name": "messages",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "uheezwu4oons0df",
+        "name": "edits",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "fif5jp3s",
+                "name": "profile_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "_pb_users_auth_",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "xloqkzip",
+                "name": "problem_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "27rpm5hb2squrua",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "bro1zppr",
+                "name": "problem",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "s2potuuu",
+                "name": "draft_id",
+                "type": "relation",
+                "system": false,
+                "required": false,
+                "options": {
+                    "collectionId": "s5bkhyoqatb3tpu",
+                    "cascadeDelete": false,
+                    "minSelect": null,
+                    "maxSelect": 1,
+                    "displayFields": []
+                }
+            },
+            {
+                "id": "cgw967zb",
+                "name": "draft",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "7n4qcfhp",
+                "name": "action",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": 10,
+                    "pattern": ""
+                }
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "_pb_users_auth_",
+        "name": "users",
+        "type": "auth",
+        "system": false,
+        "schema": [
+            {
+                "id": "qno0c68m",
+                "name": "rating",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "jbcrhr1c",
+                "name": "position",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "ncdvuzqo",
+                "name": "impact",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "ygx9yeia",
+                "name": "fullname",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "6skmg6d5",
+                "name": "role",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "p7u3t5yk",
+                "name": "to",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "6cfpzddg",
+                "name": "wanted",
+                "type": "date",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": "",
+                    "max": ""
+                }
+            },
+            {
+                "id": "fpg41tye",
+                "name": "provider",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "hmih3ks1",
+                "name": "contacts",
+                "type": "json",
+                "system": false,
+                "required": false,
+                "options": { "maxSize": 256 }
+            },
+            {
+                "id": "twbd2o0v",
+                "name": "discussions",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "euturdmf",
+                "name": "problems",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "pbu029m1",
+                "name": "drafts",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "12sznmqb",
+                "name": "solutions",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "w4bvdy70",
+                "name": "friends",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "options": {
+                    "min": null,
+                    "max": null
+                }
+            },
+            {
+                "id": "4lz9wrcw",
+                "name": "valid",
+                "type": "bool",
+                "system": false,
+                "required": false,
+                "options": {}
+            },
+            {
+                "id": "vcdruml4",
+                "name": "banned",
+                "type": "bool",
+                "system": false,
+                "required": false,
+                "options": {}
+            },
+            {
+                "id": "tat8rivg",
+                "name": "paid",
+                "type": "bool",
+                "system": false,
+                "required": false,
+                "options": {}
+            }
+        ],
+        "indexes": [],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "id = @request.auth.id",
+        "options": {
+            "allowEmailAuth": true,
+            "allowOAuth2Auth": true,
+            "allowUsernameAuth": true,
+            "exceptEmailDomains": null,
+            "manageRule": null,
+            "minPasswordLength": 5,
+            "onlyEmailDomains": null,
+            "requireEmail": false
+        }
+    }
+]
