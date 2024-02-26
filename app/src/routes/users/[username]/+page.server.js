@@ -15,6 +15,7 @@ async function loadTalk(pb, profile, user, chat) {
 
     try {
         talk = await pb.collection('talks').getOne(id);
+        if (talk.message_id) await pb.collection('talks').update(id, { message_id: null });
         talk.reacts = await loadReacts(pb, talk);
     } catch (err) {
         console.log(err.message);

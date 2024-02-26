@@ -13,7 +13,11 @@ export const normText = (text) =>
         .join(' ');
 
 
-export function handlePaste(e) {
+export function copyPaste(e) {
     let text = (e.clipboardData || window.DataTransfer).getData('text/plain');
+    document.execCommand('insertText', false, text);
+}
+
+export function pasteToEnd(text) {
     document.execCommand('insertText', false, text);
 }

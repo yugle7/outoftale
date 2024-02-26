@@ -1,8 +1,8 @@
 <script>
 	import { onDestroy, onMount } from 'svelte';
-
 	import { pb, screen } from '$lib';
-	import ToChat from '$lib/menu/ToChat.svelte';
+	
+	import Header from '../../chats/Header.svelte';
 
 	import Problem from './Problem.svelte';
 	import Solution from './Solution.svelte';
@@ -50,7 +50,7 @@
 	{#if chat}
 		<Chat {chat} {talk} {profile} />
 	{:else if solution}
-		<ToChat type="7">Решение</ToChat>
+		<Header type="7">Решение</Header>
 
 		<Problem {problem} />
 		<Solution {solution} {problem} {profile} />

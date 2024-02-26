@@ -63,11 +63,6 @@ export function getUrl(chat) {
     const { type, talk } = chat;
     let url;
 
-    if (type == 2) {
-        console.log(chat);
-        console.log(talk);
-    }
-
     if (type === 0) url = `/users/${talk.user.username}`;
     else if (type === 1) url = `/discussions/${chat.id}`;
     else if (type < 6) url = `/problems/${subId(chat.id, String(type).repeat(15))}`

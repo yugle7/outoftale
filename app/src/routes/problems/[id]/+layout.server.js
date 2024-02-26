@@ -1,4 +1,4 @@
-import { addId, getAuthor, getProblem } from "$lib";
+import { addId, getAuthor } from "$lib";
 import { error } from "@sveltejs/kit";
 
 async function loadSolution(pb, profile, problem) {
@@ -12,8 +12,7 @@ async function loadSolution(pb, profile, problem) {
             id,
             author_id: profile.id,
             author: getAuthor(profile),
-            problem_id: problem.id,
-            problem: getProblem(problem)
+            problem_id: problem.id
         });
     }
 }

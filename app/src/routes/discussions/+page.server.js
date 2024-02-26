@@ -1,3 +1,4 @@
+import { addId } from "$lib";
 import { default_params } from './data';
 
 async function loadReacts(pb, profile) {
@@ -32,7 +33,9 @@ async function loadDiscussions(pb, profile, params) {
     }
     if (profile) {
         const reacts = await loadReacts(pb, profile);
-        discussions.forEach((d) => (d.react = reacts[d.id]));
+        if (reacts) {
+            discussions.forEach((d) => (d.react = reacts[d.id]));
+        }
     }
     return discussions;
 }
@@ -51,10 +54,44 @@ export async function load({ locals, url }) {
     };
 }
 
-
 export const actions = {
-    default: async ({ request, locals }) => {
+    react: async ({ request, locals }) => {
+        const pb = locals.pb;
+        const profile = pb.authStore.model;
+
         const data = await request.formData();
-        console.log(data);
+
+        const discussion_id = data.get('discussion_id');
+        const react = data.get('react');
+
+        const id = addId(profile.id, discussion_id);
+
+        try {
+            const res = await pb.collection('thoughts').getOne(id);
+
+            if (res.react === react) return;
+            await pb.collection('thoughts').update(id, { react });
+
+            const data = {};
+            if (res.react > 0) data[res.react + '-'] = 1;
+            if (react > 0) data[react + '+'] = 1;
+
+            await pb.collection('discussions').update(discussion_id, data);
+
+        } catch (err) {
+            console.log(err.message);
+
+            const data = {};
+            data[react + '+'] = 1;
+
+            await pb.collection('discussions').update(discussion_id, data);
+
+            await pb.collection('thoughts').create({
+                id,
+                react,
+                profile_id: profile.id,
+                discussion_id
+            });
+        }
     }
 }

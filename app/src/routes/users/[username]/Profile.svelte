@@ -32,13 +32,15 @@
 		{/if}
 	</div>
 
-	<div class="row gap-20 monospace">
-		<Link href="/users?friend=1" count={friends} key="users" />
+	{#if friends || problems || discussions || drafts}
+		<div class="row gap-20 monospace">
+			<Link href="/users?friend=1" count={friends} key="users" />
 
-		<Link href="/problems?author_id={profile.id}" count={problems} key="problems" />
-		<Link href="/discussions?author_id={profile.id}" count={discussions} key="discussions" />
-		<Link href="/drafts?author_id={profile.id}" count={drafts} key="drafts" />
-	</div>
+			<Link href="/problems?author_id={profile.id}" count={problems} key="problems" />
+			<Link href="/discussions?author_id={profile.id}" count={discussions} key="discussions" />
+			<Link href="/drafts?author_id={profile.id}" count={drafts} key="drafts" />
+		</div>
+	{/if}
 
 	<div class="col gap-10">
 		<a href="/change">Обновить данные</a>

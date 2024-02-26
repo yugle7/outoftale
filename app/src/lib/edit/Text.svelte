@@ -1,6 +1,6 @@
 <script>
 	import { params } from '$lib';
-	import { handlePaste } from '$lib/edit/data';
+	import { copyPaste } from '$lib/edit/data';
 
 	export let key;
 	export let title;
@@ -10,7 +10,7 @@
 <div
 	role="textbox"
 	tabindex="0"
-	on:paste|preventDefault={handlePaste}
+	on:paste|preventDefault={copyPaste}
 	contenteditable="true"
 	placeholder={title}
 	bind:innerText={$params[key]}

@@ -1,4 +1,5 @@
 <script>
+	import { params } from '$lib';
 	import { page } from '$app/stores';
 
 	export let href;
@@ -7,7 +8,7 @@
 	$: selected = $page.url.pathname === href;
 </script>
 
-<a {href} class="row gap-15" class:selected>
+<a {href} class="row gap-15" class:selected on:click={() => ($params = {})}>
 	<img src="/icons/{key}.svg" alt={key} />
 	<slot />
 </a>

@@ -1,4 +1,5 @@
 <script>
+	import { enhance, applyAction } from '$app/forms';
 	import { pb, screen, member_became } from '$lib';
 
 	import { onDestroy, onMount } from 'svelte';
@@ -20,7 +21,7 @@
 
 	if ($screen) $screen = 'content';
 
-	function download() {
+	async function download() {
 		messages = chat.messages;
 		sent = messages.length;
 
@@ -32,14 +33,11 @@
 			if (profile) m.react = talk.reacts[m.id];
 		});
 
-		if (talk.message_id) {
-			$look = talk.message_id;
-			pb.collection('talks').update(talk.id, { message_id: null });
-		}
+		$look = talk.message_id;
 	}
 
 	async function subscribe() {
-		download();
+		await download();
 
 		await pb.collection('messages').subscribe('*', async ({ action, record }) => {
 			if (record.chat_id !== chat.id) return;
@@ -76,16 +74,13 @@
 
 		if (profile) {
 			await pb.collection('chats').subscribe(chat.id, async ({ action, record }) => {
-				if (action === 'update') {
-					chat.read = record.read;
-					chat.sender_id = record.sender_id;
-				}
+				if (action === 'update') chat = record;
 			});
 			await pb.collection('talks').subscribe(talk.id, async ({ action, record }) => {
 				if (action === 'update') {
 					if (record.message_id) {
 						$look = record.message_id;
-						pb.collection('talks').update(talk.id, { message_id: null });
+						await pb.collection('talks').update(talk.id, { message_id: null });
 					}
 				}
 				if (action !== 'delete') {
@@ -116,23 +111,18 @@
 
 		{#if profile}
 			{#if !profile.role && (chat.type || talk.user.username !== 'support')}
-				<a href="/discassions/{member_became}" target="_self" class="footer center link padding-10">
+				<a href="/discussions/{member_became}" target="_self" class="footer center link padding-10">
 					Стать участником
 				</a>
 			{:else if talk.deleted}
-				<button
-					class="footer center link padding-10"
-					on:click={async () => {
-						try {
-							talk.deleted = false;
-							pb.collection('talks').update(talk.id, { deleted: false });
-						} catch (err) {
-							console.log(err.message);
-						}
-					}}
-				>
-					Войти в чат
-				</button>
+				<form method="post" action="/chats?/delete" use:enhance={() => applyAction} class="footer">
+					<input type="hidden" value={talk.id} name="talk_id" id="talk_id" />
+					<input type="hidden" value={false} name="deleted" id="deleted" />
+
+					<button class="center width-100 link padding-10" type="submit">
+						Войти в чат
+					</button>
+				</form>
 			{:else}
 				<Send {talk} {chat} {profile} />
 			{/if}

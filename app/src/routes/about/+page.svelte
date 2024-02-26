@@ -1,10 +1,11 @@
 <script>
 	import { screen } from '$lib';
-	import Header from '$lib/menu/Header.svelte';
+	
+	import Header from '../discussions/Header.svelte';
 </script>
 
 {#if $screen}
-	<Header>О сайте</Header>
+	<Header topic="1">О сайте</Header>
 {/if}
 
 <div class="col relative content-900 gap-10 padding-20">
@@ -22,8 +23,6 @@
 		Сайт стимулирует развитие мышления, логики и креативности участников, а также способствует
 		расширению кругозора и обогащению интеллектуального опыта.
 	</p>
-	<p>
-		Обязательно посетите раздел <a href="/discussions?topic=1">Ответы на частые вопросы</a>, 
-		чтобы узнать больше.
-	</p>
+
+	<a class="center top-20" href="/discussions?topic=1">Ответы на частые вопросы</a>
 </div>

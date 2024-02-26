@@ -1,11 +1,10 @@
 <script>
 	import { pb } from '$lib';
-	import { browser } from '$app/environment';
 
 	import Ago from '$lib/show/Ago.svelte';
 
 	import { down, select, look, show, scroll } from './data';
-	import { afterUpdate, onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	import Message from './Message.svelte';
 
@@ -73,8 +72,9 @@
 		$look = null;
 
 		m.scrollIntoView();
+	
 		m.classList.add('look');
-		setTimeout(() => m.classList.remove('look'), 2000);
+		setTimeout(() => m.classList.remove('look'), 4000);
 	}
 	$: if (output && $select && document) {
 		const m = document.getElementById($select);

@@ -2,7 +2,7 @@
 	import { screen } from '$lib';
 
 	import Header from '$lib/show/Header.svelte';
-	export let type;
+	export let topic;
 </script>
 
 <Header>
@@ -14,7 +14,7 @@
 		<slot />
 	</div>
 
-	<a class="padding-5" href="?type={type}">
-		<img class="icon" src="/icons/chat.svg" alt="params" />
+	<a class="padding-5" href="/discussions?topic={topic}">
+		<img class="icon" src="/icons/discussions.svg" alt="topic" />
 	</a>
 </Header>

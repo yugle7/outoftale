@@ -425,11 +425,6 @@ nav {
 	z-index: 1;
 }
 
-.shy {
-	opacity: 0;
-	animation: shy 1s forwards;
-}
-
 @keyframes shy {
 	0% {
 		opacity: 0;
@@ -440,22 +435,20 @@ nav {
 	}
 }
 
-.look {
-	animation: look 2s ease-in-out;
+.shy {
+	opacity: 0;
+	animation: shy 1s forwards;
 }
 
-@keyframes look {
-	0% {
-		background-color: none;
-	}
 
+@keyframes look {
 	20% {
 		background-color: var(--color-15);
 	}
+}
 
-	100% {
-		background-color: none;
-	}
+.look {
+	animation: look 3s ease-in-out;
 }
 
 .show {

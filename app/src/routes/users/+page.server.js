@@ -25,7 +25,7 @@ function getUser(user, friends, positions) {
 }
 
 async function loadUsers(pb, profile, params) {
-    const { role, wanted, friend } = params;    
+    const { role, wanted, friend } = params;
     if (wanted && role >= profile.role) return [];
 
     let { sort } = params;
@@ -40,7 +40,15 @@ async function loadUsers(pb, profile, params) {
         filters.push('wanted!=null');
         sort = sort.replace('created', 'wanted');
     }
-    filters.push(role == null ? (wanted ? 'role<' + profile.role : 'rating>0') : `role=${role}`)
+    if (role == null) {
+        if (wanted) {
+            filters.push('role<' + profile.role);
+        } else if (!friend) {
+            filters.push('rating>0');
+        }
+    } else {
+        filters.push(`role=${role}`)
+    }
 
     const res = await pb.collection('users').getList(1, 1000, {
         filter: filters.join('&&'),

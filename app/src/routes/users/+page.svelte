@@ -56,7 +56,7 @@
 
 	<Resize>
 		<Side {default_params}>
-			<Params {profile} {params} />
+			<Params {profile} />
 		</Side>
 	</Resize>
 {/if}

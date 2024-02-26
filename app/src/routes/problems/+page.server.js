@@ -1,3 +1,4 @@
+import { addId, getAuthor } from '$lib';
 import { default_params } from './data';
 
 async function loadSolutions(pb, profile) {
@@ -66,13 +67,46 @@ export async function load({ locals, url }) {
     };
 }
 
-
 export const actions = {
-    react: async ({ request, params, locals }) => {
+    react: async ({ request, locals }) => {
         const pb = locals.pb;
         const profile = pb.authStore.model;
 
         const data = await request.formData();
-        console.log(data);
+
+        const problem_id = data.get('problem_id');
+        const react = data.get('react');
+
+        const id = addId(profile.id, problem_id);
+
+        try {
+            const res = await pb.collection('solutions').getOne(id);
+
+            if (res.react === react) return;
+            await pb.collection('solutions').update(id, { react });
+
+            const data = {};
+            if (res.react > 0) data[res.react + '-'] = 1;
+            if (react > 0) data[react + '+'] = 1;
+
+            await pb.collection('problems').update(problem_id, data);
+
+        } catch (err) {
+            console.log(err.message);
+
+            const data = {};
+            data[react + '+'] = 1;
+
+            await pb.collection('problems').update(problem_id, data);
+
+            await pb.collection('solutions').create({
+                id,
+                react,
+                author_id: profile.id,
+                author: getAuthor(profile),
+                problem_id
+            });
+        }
+
     }
 }

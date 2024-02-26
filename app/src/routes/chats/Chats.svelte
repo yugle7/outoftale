@@ -1,5 +1,5 @@
 <script>
-	import { pb, loaded } from '$lib';
+	import { pb } from '$lib';
 
 	import { onDestroy, onMount } from 'svelte';
 	import ToChat from './ToChat.svelte';
@@ -10,8 +10,6 @@
 	export let params;
 
 	async function subscribe() {
-		$loaded = true;
-
 		chats.sort((a, b) => (a.changed < b.changed) - (a.changed > b.changed));
 		chats = chats;
 

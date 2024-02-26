@@ -1,31 +1,46 @@
-import { addId } from '../../lib/index.js';
+import { addId, getProblem } from '../../lib/index.js';
 import { default_params } from './data';
 
 async function loadProblems(pb, profile, params) {
     const filters = [`author_id="${profile.id}"`, 'progress=5'];
 
     const { weight, status, category } = params;
-    if (weight != null) filters.push(`problem.weight=${weight}`);
-    if (status != null) filters.push(`problem.status=${status}`);
-    if (category != null) filters.push(`problem.categories~${category}`);
 
     const res = await pb.collection('solutions').getFullList({
-        filter: filters.join('&&')
+        filter: filters.join('&&'),
+        expand: 'problem_id'
     });
-    return res.map(({ problem_id }) => problem_id);
+
+    const problems = {};
+
+    res.map(({ expand }) => expand.problem_id).filter(
+        p =>
+            (weight == null || p.weight == weight) &&
+            (status == null || p.status == status) &&
+            (category == null || p.categories.includes(category))
+    ).forEach(p => (problems[p.id] = getProblem(p)));
+
+    return problems;
 }
 
 async function loadSolutions(pb, profile, params) {
     const { sort, progress, author_id, problem_id, reviewer_id, reviewed } = params;
 
+    let problems = {};
+
     const filters = [`progress=${progress}`];
     if (problem_id) {
-        const res = await pb.collection('solutions').getOne(addId(problem_id, profile.id));
+        const res = await pb.collection('solutions').getOne(addId(problem_id, profile.id), { expand: 'problem_id' });
         if (res.progress !== 5) return [];
+
+        problems[problem_id] = getProblem(res.expand.problem_id);
+        filters.push(`problem_id="${problem_id}"`);
     } else {
-        const problems = await loadProblems(pb, profile, params);
-        if (problems.length === 0) return [];
-        filters.push('(' + problems.map((p) => `problem_id="${p}"`).join('||') + ')');
+        problems = await loadProblems(pb, profile, params);
+        
+        const ids = Object.keys(problems);
+        if (ids.length === 0) return [];
+        filters.push('(' + ids.map((id) => `problem_id="${id}"`).join('||') + ')');
     }
 
     if (reviewer_id) {
@@ -36,13 +51,16 @@ async function loadSolutions(pb, profile, params) {
     if (author_id) {
         filters.push(author_id ? `author_id="${author_id}"` : `author_id!="${profile.id}"`);
     }
-    if (problem_id) filters.push(`problem_id="${problem_id}"`);
+    console.log(filters);
 
     const res = await pb.collection('solutions').getList(1, 1000, {
         filter: filters.join('&&'),
         sort
     });
-    return res.items;
+
+    const solutions = res.items;
+    solutions.forEach(s => (s.problem = problems[s.problem_id]));
+    return solutions;
 }
 
 export async function load({ locals, url }) {

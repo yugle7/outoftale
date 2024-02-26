@@ -1,5 +1,5 @@
 # Development
-FROM node:20-alpine as dev
+FROM node:alpine as dev
 
 WORKDIR /app
 COPY package.json /app/package.json
@@ -11,7 +11,7 @@ COPY . .
 CMD ["npm", "run", "dev"]
 
 # Build
-FROM node:20-alpine as build
+FROM node:alpine as build
 
 WORKDIR /app
 COPY . .
@@ -20,7 +20,7 @@ RUN npm install
 CMD ["npm", "run", "build"]
 
 # Production
-FROM node:20-alpine as prod
+FROM node:alpine as prod
 
 WORKDIR /app
 COPY --from=build /app/build /app/build
@@ -30,4 +30,4 @@ COPY package-lock.json /app/package-lock.json
 
 RUN npm install --production
 
-CMD node build
+CMD ["node", "-r", "dotenv/config", "build"]

@@ -2,7 +2,7 @@
 	import { screen } from '$lib';
 	import { enhance } from '$app/forms';
 
-	import { handlePaste } from '$lib/edit/data';
+	import { copyPaste } from '$lib/edit/data';
 
 	export let data;
 	export let form;
@@ -95,7 +95,7 @@
 			tabindex="0"
 			contenteditable="true"
 			on:keydown={() => delete errors.contacts}
-			on:paste|preventDefault={handlePaste}
+			on:paste|preventDefault={copyPaste}
 			placeholder="Контакты"
 			bind:innerText={contacts}
 			type="text"

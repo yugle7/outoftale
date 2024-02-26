@@ -11,7 +11,7 @@
 	const { id, problem, answer, proof } = solution;
 
 	const getSubtitle = () => {
-		const { weight, categories } = solution.problem;
+		const { weight, categories } = problem;
 
 		const names = [weight];
 		names.push(categories.map((c) => problem_category[c]).join(', '));

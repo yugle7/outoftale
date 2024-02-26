@@ -16,6 +16,8 @@ async function loadTalk(pb, profile_id, chat_id) {
 
     try {
         talk = await pb.collection('talks').getOne(id);
+        if (talk.message_id) await pb.collection('talks').update(id, { message_id: null });
+
         talk.reacts = await loadReacts(pb, id);
     } catch (err) {
         console.log(err.message);
@@ -38,8 +40,8 @@ async function loadMessages(pb, chat_id) {
     });
 }
 
-async function loadChat(pb, solution) {
-    const { id, problem } = solution;
+async function loadChat(pb, solution, problem) {
+    const { id } = solution;
     let chat;
 
     try {
@@ -73,7 +75,7 @@ async function sendMessage(pb, profile, solution, progress) {
 
         res = await pb.collection('chats').update(solution.id, {
             sender_id: profile.id,
-            message: { text, author },
+            message: { text, author, message_id: res.id },
             'sent+': 1,
             changed: res.updated
         });
@@ -89,7 +91,6 @@ async function sendMessage(pb, profile, solution, progress) {
     } catch (err) {
         console.log(err.message);
     }
-
 }
 
 export async function load({ parent, url, locals }) {
@@ -101,9 +102,9 @@ export async function load({ parent, url, locals }) {
     const type = +url.searchParams.get('type');
     if (type !== 7) return {};
 
-    const { solution } = await parent();
+    const { solution, problem } = await parent();
 
-    const chat = await loadChat(pb, solution)
+    const chat = await loadChat(pb, solution, problem)
     const talk = await loadTalk(pb, profile.id, chat.id);
 
     return { chat, talk }

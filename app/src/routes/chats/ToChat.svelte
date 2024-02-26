@@ -1,5 +1,5 @@
 <script>
-	import { pb } from '$lib';
+	import { enhance, applyAction } from '$app/forms';
 
 	import Title from '$lib/chat/Title.svelte';
 	import Snippet from '$lib/show/Snippet.svelte';
@@ -15,35 +15,46 @@
 	$: talk = chat.talk;
 
 	let clicked;
-
-	async function handleDelete() {
-		await pb.collection('talks').update(talk.id, { deleted: !talk.deleted });
-		clicked = false;
-	}
+	let { id, deleted } = chat.talk;
 </script>
 
-<section class:highlighted={clicked}>
-	<div class="col relative padding-20 content-900 gap-5">
+<div class:highlighted={clicked}>
+	<form
+		method="post"
+		action="?/delete"
+		use:enhance={() => applyAction}
+		class="col relative padding-20 content-900 gap-5"
+	>
+		<input type="hidden" value={id} name="talk_id" id="talk_id" />
+		<input type="hidden" value={deleted} name="deleted" id="deleted" />
+
 		<Title {talk} {chat} {params} />
 
-		{#if talk.deleted}
-			<button class="link top-5" on:click={handleDelete}>Вернуться в чат</button>
-		{:else}
+		{#if !deleted}
 			<Notify {chat} {talk} {profile} />
 
 			<Click on:click={() => (clicked = !clicked)}>
 				<Snippet {chat} {profile} />
 			</Click>
-
-			{#if clicked}
-				<button class="link top-5" on:click={handleDelete}>Выйти из чата</button>
-			{/if}
 		{/if}
-	</div>
-</section>
+
+		<button
+			class:hidden={!clicked}
+			class="link top-5"
+			type="submit"
+			on:click={() => (deleted = clicked = !deleted)}
+		>
+			{#if deleted}
+				Вернуться в чат
+			{:else}
+				Выйти из чата
+			{/if}
+		</button>
+	</form>
+</div>
 
 <style>
-	div {
+	form {
 		padding-right: 45px;
 	}
 </style>

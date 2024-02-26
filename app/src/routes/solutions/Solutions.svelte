@@ -31,7 +31,7 @@
 
 {#if dst.length > 0}
 	<ul>
-		{#each dst as solution (solution.id)}
+		{#each dst as solution (solution.id + solution.updated)}
 			<li class="hover">
 				<ToSolution {solution} />
 			</li>

@@ -18,6 +18,7 @@ async function loadTalk(pb, profile_id, chat_id) {
 
     try {
         talk = await pb.collection('talks').getOne(id);
+        if (talk.message_id) await pb.collection('talks').update(id, { message_id: null });
         talk.reacts = await loadReacts(pb, id);
     } catch (err) {
         console.log(err.message);
@@ -112,24 +113,26 @@ const createTalk = async (pb, solution) => {
 };
 
 const updateTalk = async (pb, solution) => {
-    const { id, author_id, author, progress } = solution;
+    const { author_id, author, progress } = solution;
     const text = solution_progress[progress];
 
-    let res = await pb.collection('messages').create({
-        text,
-        author_id,
-        author,
-        chat_id: id
-    });
     try {
-        res = await pb.collection('chats').update(id, {
+        let res = await pb.collection('messages').create({
+            text,
+            author_id,
+            author,
+            chat_id: solution.id
+        });
+    
+        res = await pb.collection('chats').update(solution.id, {
             'sent+': 1,
             sender_id: author_id,
-            message: { text, author },
+            message: { text, author, message_id: res.id },
             changed: res.updated
         });
-        const talk_id = addId(author_id, id);
-        await pb.collection('talks').update(talk_id, {
+    
+        const id = addId(author_id, solution.id);
+        await pb.collection('talks').update(id, {
             read: res.sent,
             deleted: false
         });
@@ -214,7 +217,7 @@ export const actions = {
 
         if (res.progress !== progress) {
             actions.push(sendMessage(pb, res, step));
-            
+
             if (!step) {
                 actions.push(pb.collection('users').update(profile.id, { 'solutions+': 1 }));
                 actions.push(pb.collection('problems').update(problem_id, { 'solutions+': 1 }));

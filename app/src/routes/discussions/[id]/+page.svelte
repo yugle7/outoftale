@@ -1,5 +1,5 @@
 <script>
-	import ToChat from '$lib/menu/ToChat.svelte';
+	import Header from '../../chats/Header.svelte';
 
 	import Read from './Read.svelte';
 	import Edit from './Edit.svelte';
@@ -50,7 +50,7 @@
 			<Close on:click={() => (edit = null)} />
 			<Edit {discussion} on:click={() => (edit = false)} />
 		{:else}
-			<ToChat type="1">Общение</ToChat>
+			<Header type="1">Общение</Header>
 			<Read {discussion} {profile} on:click={() => (edit = true)} />
 		{/if}
 	{/if}

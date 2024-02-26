@@ -3,17 +3,18 @@ import { PB_URL } from '$env/static/private'
 
 export const handle = async ({ event, resolve }) => {
     event.locals.pb = new PocketBase(PB_URL);
+    const pb = event.locals.pb;
 
-    event.locals.pb.authStore.loadFromCookie(event.request.headers.get('cookie') || '');
+    pb.authStore.loadFromCookie(event.request.headers.get('cookie') || '');
 
     try {
-        event.locals.pb.authStore.isValid && await event.locals.pb.collection('users').authRefresh();
+        pb.authStore.isValid && await pb.collection('users').authRefresh();
     } catch (err) {
         console.log(err.message);
-        event.locals.pb.authStore.clear();
+        pb.authStore.clear();
     }
     const response = await resolve(event);
-
-    response.headers.append('set-cookie', event.locals.pb.authStore.exportToCookie({ sameSite: 'Lax' }));
+    response.headers.append('set-cookie', pb.authStore.exportToCookie({ sameSite: 'Lax', secure: false }));
+    response.headers.append('Access-Control-Allow-Origin', '*');
     return response;
 }

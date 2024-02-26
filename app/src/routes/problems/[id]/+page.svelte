@@ -5,8 +5,6 @@
 	import { getTypes } from '../data';
 	import { chat_type } from '$lib/chat/data';
 
-	import Header from '$lib/menu/Header.svelte';
-
 	import Solution from './Solution.svelte';
 	import Edit from './Edit.svelte';
 	import Problem from './Problem.svelte';
@@ -15,7 +13,7 @@
 	import Resize from '$lib/show/Resize.svelte';
 	import Close from '$lib/show/Close.svelte';
 
-	import ToChat from '$lib/menu/ToChat.svelte';
+	import Header from '../../chats/Header.svelte';
 	import Footer from './Footer.svelte';
 
 	export let data;
@@ -74,20 +72,16 @@
 				{/each}
 			</div>
 		{:else}
-			{#if types.length > 1}
-				<Header to="chat">Задача</Header>
-			{:else}
-				<ToChat type="2">Задача</ToChat>
-			{/if}
-			
+			<Header type={types.length > 1 ? 2 : null}>Задача</Header>
+
 			<Problem {problem} {solution} {profile} />
-			
+
 			{#if profile}
 				<div class="highlighted">
 					<Solution {solution} />
 				</div>
 			{/if}
-			
+
 			<Footer {problem} {solution} {profile} on:click={() => (edit = true)} />
 		{/if}
 	{/if}
@@ -97,13 +91,13 @@
 	{:else}
 		<div class="scroll">
 			<Problem {problem} {solution} {profile} />
-			
+
 			{#if profile}
 				<div class="highlighted">
 					<Solution {solution} />
 				</div>
 			{/if}
-			
+
 			<Footer {problem} {solution} {profile} on:click={() => (edit = true)} />
 		</div>
 	{/if}

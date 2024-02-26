@@ -5,7 +5,6 @@ import { PUBLIC_PB_URL } from '$env/static/public'
 
 export const screen = writable(null);
 export const params = writable({});
-export const loaded = writable(true);
 export const edited = writable({});
 export const search = writable('');
 export const create = writable(false);
@@ -61,4 +60,9 @@ export function getDraft(problem) {
 export function getSolution(solution) {
     const { reviewer_id, progress, answer, proof } = solution;
     return { reviewer_id, progress, answer, proof };
+}
+
+export function getReply(message) {
+    const { id, author_id, author, text } = message;
+    return { id, author_id, author, text };
 }

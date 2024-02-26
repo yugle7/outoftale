@@ -50,3 +50,44 @@ export async function load({ locals, url }) {
         params
     };
 }
+
+export const actions = {
+    react: async ({ request, locals }) => {
+        const pb = locals.pb;
+        const profile = pb.authStore.model;
+
+        const form = await request.formData();
+
+        const draft_id = form.get('draft_id');
+        const react = form.get('react');
+
+        const id = addId(profile.id, draft_id);
+        const data = {};
+
+        try {
+            const res = await pb.collection('applies').getOne(id);
+
+            if (res.react === react) return;
+            await pb.collection('applies').update(id, { react });
+
+            if (res.react > 0) data[res.react + '-'] = 1;
+            if (react > 0) data[react + '+'] = 1;
+
+            await pb.collection('drafts').update(draft_id, data);
+
+        } catch (err) {
+            console.log(err.message);
+
+            data[react + '+'] = 1;
+            await pb.collection('drafts').update(draft_id, data);
+
+            await pb.collection('applies').create({
+                id,
+                react,
+                profile_id: profile.id,
+                draft_id
+            });
+        }
+
+    }
+}

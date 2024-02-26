@@ -24,8 +24,11 @@ export const actions = {
             categories.length > 0
         ) {
             const solved = Boolean(answer || proof);
+            const author = getAuthor(profile);
 
             const res = await locals.pb.collection('problems').create({
+                author_id: profile.id,
+                author,
                 title,
                 categories,
                 condition,
@@ -34,8 +37,6 @@ export const actions = {
                 proof,
                 status: +solved,
                 solutions: +solved,
-                author_id: profile.id,
-                author: getAuthor(profile),
                 changed: new Date()
             });
 
@@ -43,9 +44,8 @@ export const actions = {
                 await locals.pb.collection('solutions').create({
                     id: addId(profile.id, res.id),
                     author_id: profile.id,
-                    auhtor: res.author,
+                    author,
                     problem_id: res.id,
-                    problem: getProblem(res),
                     answer,
                     proof,
                     step: 2,

@@ -2,7 +2,6 @@
 	import { screen } from '$lib';
 
 	import Header from '$lib/show/Header.svelte';
-	export let to = 'params';
 </script>
 
 <Header>
@@ -13,6 +12,6 @@
 	<div class="center"><slot /></div>
 
 	<button class="padding-5" on:click={() => ($screen = 'params')}>
-		<img class="icon" src="/icons/{to}.svg" alt={to} />
+		<img class="icon" src="/icons/params.svg" alt='params' />
 	</button>
 </Header>
