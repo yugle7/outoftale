@@ -1,5 +1,5 @@
-npm create svelte@latest my-app
-cd my-app
+npm create svelte@latest app
+cd app
 npm install
 npm i pocketbase
 npm i dotenv

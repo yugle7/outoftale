@@ -1,5 +1,5 @@
 import { addId } from "$lib";
-import { error } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 
 async function loadRect(pb, profile, draft) {
     const id = addId(draft.id, profile.id);
@@ -24,7 +24,7 @@ export async function load({ params, locals }) {
     const pb = locals.pb;
     
     const profile = pb.authStore.model;
-    if (!profile) return {};
+    if (!profile) throw redirect('/login');
 
     const draft = await loadDraft(pb, params.id);
     draft.react = await loadRect(pb, profile, draft)

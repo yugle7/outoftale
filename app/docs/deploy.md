@@ -1,6 +1,7 @@
 ssh gleb@178.154.206.249
 sudo apt update
 sudo apt install git-all
+
 "nvm установка на убунту и добавляем переменные окружения, чтобы он заработал NVM_DIR"
 nvm install версия_ноды
 npm i
