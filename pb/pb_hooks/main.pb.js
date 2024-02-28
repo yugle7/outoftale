@@ -1,5 +1,5 @@
 onAfterBootstrap((e) => {
-    const src = '/Users/gleb/Projects/sveltekit/outoftale/pb/pb_hooks';
+    const src = '/root/outoftale/pb/pb_hooks';
     
     const count = new Array(2000).fill(0);
     {
