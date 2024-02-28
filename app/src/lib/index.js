@@ -10,12 +10,9 @@ export const search = writable('');
 export const create = writable(false);
 
 export const back = writable('');
-export const role_rating = [0, 5, 100, 1000];
-
-export const member_became = 'yny763xiqeqteno';
 
 export const pb = new PocketBase(PUBLIC_PB_URL);
-pb.autoCancellation(false);
+// pb.autoCancellation(false);
 
 function getCode(s, i) {
     const n = s.charCodeAt(i);

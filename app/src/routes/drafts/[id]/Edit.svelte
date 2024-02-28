@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { params } from '$lib';
 
-	import Select from '$lib/edit/Select.svelte';
+	import Selects from '$lib/edit/Selects.svelte';
 	import Text from '$lib/edit/Text.svelte';
 
 	import { problem_category } from '../../problems/data';
@@ -18,7 +18,7 @@
 <form method="post" action="?/edit" class="col scroll padding-20 content-900 gap-30" use:enhance>
 	<Text key="title" title="Название" value={title} />
 
-	<Select key="categories" title="Категории" labels={problem_category} values={categories} />
+	<Selects key="categories" title="Категории" labels={problem_category} values={categories} />
 
 	<Text key="condition" title="Условие" value={condition} />
 	<Text key="notes" title="Примечания" value={notes} />

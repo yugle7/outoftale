@@ -22,7 +22,9 @@ async function loadDraft(pb, id) {
 
 export async function load({ params, locals }) {
     const pb = locals.pb;
+    
     const profile = pb.authStore.model;
+    if (!profile) return {};
 
     const draft = await loadDraft(pb, params.id);
     draft.react = await loadRect(pb, profile, draft)

@@ -22,7 +22,15 @@
 				key={react_key[r]}
 				type={r === react}
 				count={discussion[r]}
-				on:click={() => (react = r === react ? 0 : r)}
+				on:click={() => {
+					if (react > 0) discussion[react]--;
+					if (r === react) {
+						react = 0;
+					} else {
+						react = r;
+						discussion[react]++;
+					}
+				}}
 			/>
 		{/each}
 	</form>

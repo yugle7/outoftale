@@ -1,4 +1,4 @@
-import { error } from "@sveltejs/kit";
+import { error, redirect } from "@sveltejs/kit";
 
 
 async function loadSolution(pb, id) {
@@ -12,10 +12,13 @@ async function loadSolution(pb, id) {
 
 export async function load({ params, locals }) {
     const pb = locals.pb;
+    
     const profile = pb.authStore.model;
+    if (!profile) throw redirect('/login');
 
     const solution = await loadSolution(pb, params.id);
-
+    if (!solution) return {};
+ 
     const problem = solution.expand.problem_id;
     delete solution.expand;
 

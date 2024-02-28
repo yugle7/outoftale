@@ -21,7 +21,6 @@ async function updateTalks(pb, profile, message) {
         const { author_id } = reply;
         if (author_id !== profile.id) users.push({ id: author_id });
     }
-    console.log(users);
     Promise.all(
         users.map(({ id }) => {
             id = addId(id, chat_id);
@@ -70,7 +69,7 @@ async function createMessage(pb, profile, message) {
         }
     }
     if (type === 1) {
-        await pb.collection('discussions').update(chat_id, { messages: sent, changed: updated });
+        await pb.collection('discussions').update(chat_id, { 'messages+': 1, changed: updated });
     }
 }
 async function updateMessage(pb, message) {
@@ -124,16 +123,12 @@ export const actions = {
         const message = JSON.parse(data.get('message'));
         const edited = data.get('edited') === 'true';
 
-        console.log(message);
-
         if (edited) {
             await editMessage(pb, profile, message);
         } else {
             if (message.id) {
-                console.log('updateMessage');
                 await updateMessage(pb, message);
             } else {
-                console.log('createMessage');
                 await createMessage(pb, profile, message);
             }
             await updateTalks(pb, profile, message);
@@ -144,7 +139,6 @@ export const actions = {
         const profile = pb.authStore.model;
 
         const data = await request.formData();
-        console.log(data);
 
         const message_id = data.get('message_id');
         const react = data.get('react');

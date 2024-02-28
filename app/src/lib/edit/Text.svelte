@@ -4,16 +4,19 @@
 
 	export let key;
 	export let title;
+	
+	let value = $params[key];
+	$: $params[key] = value;
 </script>
 
-<input name={key} id={key} type="hidden" value={$params[key]} />
+<input name={key} id={key} type="hidden" {value} />
 <div
 	role="textbox"
 	tabindex="0"
 	on:paste|preventDefault={copyPaste}
 	contenteditable="true"
 	placeholder={title}
-	bind:innerText={$params[key]}
+	bind:innerText={value}
 />
 
 <style>

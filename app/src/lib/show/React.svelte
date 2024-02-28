@@ -35,7 +35,7 @@
 		filter: sepia(100%) saturate(1000%) hue-rotate(30deg);
 	}
 	.blue {
-		filter: sepia(100%) saturate(10000%) hue-rotate(220deg);
+		filter: sepia(100%) saturate(1000%) hue-rotate(190deg);
 	}
 	.purple {
 		filter: sepia(100%) saturate(10000%) hue-rotate(270deg);

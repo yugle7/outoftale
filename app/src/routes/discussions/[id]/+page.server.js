@@ -60,13 +60,15 @@ async function loadChat(pb, discussion) {
 
 export async function load({ parent, url, locals }) {
     const pb = locals.pb;
-    const profile = pb.authStore.model;
 
     if (url.searchParams.get('type') !== '1') return {};
 
     const { discussion } = await parent();
+    if (!discussion) return {};
+    
     const chat = await loadChat(pb, discussion)
 
+    const profile = pb.authStore.model;
     if (!profile) return { chat };
 
     const talk = await loadTalk(pb, profile.id, chat.id);

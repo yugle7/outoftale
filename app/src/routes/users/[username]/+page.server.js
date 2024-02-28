@@ -50,6 +50,7 @@ async function loadChat(pb, profile, user) {
 
         chat = await pb.collection('chats').create({
             id,
+            title: profile.username + ' – ' + user.username,
             type: 0,
             changed: new Date()
         });
@@ -59,14 +60,16 @@ async function loadChat(pb, profile, user) {
 }
 
 export async function load({ parent, url, locals }) {
-    const type = url.searchParams.get('type');
-    if (type !== '0') return {};
-
     const pb = locals.pb;
+
     const profile = pb.authStore.model;
     if (!profile) return {};
 
+    if (url.searchParams.get('type') !== '0') return {};
+
     const { user } = await parent();
+    if (!user) return {};
+
     const chat = await loadChat(pb, profile, user);
     const talk = await loadTalk(pb, profile, user, chat);
 

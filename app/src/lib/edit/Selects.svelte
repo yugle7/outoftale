@@ -6,29 +6,31 @@
 	export let labels;
 	export let title;
 
-	$: mask = getMask($params[key]);
+	let values = $params[key].map(String);
+	$: $params[key] = values;
 
-	let selected = $params[key].length > 0;
+	$: mask = getMask(values);
+	let selected = values.length > 0;
+
+	$: console.log($params, values);
 </script>
 
-{#if selected}
-	<button class="link font-14" on:click|preventDefault={() => (selected = false)}>
-		{$params[key].map((v) => labels[v]).join(', ')}
-	</button>
-{:else}
-	<div class="col gap-10">
-		<button class="link font-14" on:click|preventDefault={() => (selected = true)}>
-			{title}
-		</button>
+<button class="link font-14" on:click|preventDefault={() => (selected = !selected)}>
+	{#if selected}
+		{values.map((v) => labels[v]).join(', ')}
+	{:else}
+		{title}
+	{/if}
+</button>
 
-		{#each Object.entries(labels) as [value, label] (value)}
-			<label class="link" class:selected={mask & (1 << value)}>
-				<input type="checkbox" name={key} id={key} {value} bind:group={$params[key]} />
-				{label}
-			</label>
-		{/each}
-	</div>
-{/if}
+<div class="col gap-10" class:hidden={selected}>
+	{#each Object.entries(labels) as [value, label] (value)}
+		<label class="link" class:selected={mask & (1 << value)}>
+			<input type="checkbox" name={key} {value} bind:group={values} />
+			{label}
+		</label>
+	{/each}
+</div>
 
 <style>
 	input[type='checkbox'] {

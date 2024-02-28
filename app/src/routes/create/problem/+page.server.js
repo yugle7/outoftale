@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { addId, getAuthor, getProblem } from "$lib";
+import { addId, getAuthor } from "$lib";
 
 export const actions = {
     default: async ({ request, locals }) => {
@@ -10,8 +10,8 @@ export const actions = {
 
         const data = await request.formData();
 
-        const title = data.get('title') || '';
-        const condition = data.get('condition') || '';
+        const title = data.get('title');
+        const condition = data.get('condition');
         const categories = data.getAll('categories');
 
         const notes = data.get('notes') || null;
@@ -19,8 +19,8 @@ export const actions = {
         const proof = data.get('proof') || null;
 
         if (
-            title !== '' &&
-            condition !== '' &&
+            title &&
+            condition &&
             categories.length > 0
         ) {
             const solved = Boolean(answer || proof);

@@ -1,6 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
-	import { params } from '$lib';
+	import { params, screen } from '$lib';
 
 	import Selects from '$lib/edit/Selects.svelte';
 	import Text from '$lib/edit/Text.svelte';
@@ -11,11 +11,13 @@
 	export let data;
 	const { profile } = data;
 
-	$params = { categories: [] };
-	$: disabled = ['title', 'categories', 'condition'].some((k) => !$params[k]);
+	$params = { categories: []};
+	$: disabled = !$params.title || !$params.condition || !$params.categories.length;
 </script>
 
-<Close {profile} />
+{#if $screen}
+	<Close {profile} />
+{/if}
 
 <form method="post" class="col content-900 padding-20 gap-30" use:enhance>
 	<Text key="title" title="Название" />
@@ -28,5 +30,10 @@
 	<Text key="answer" title="Ответ" />
 	<Text key="proof" title="Доказательство" />
 
-	<button class="button right" {disabled} type="submit">Предложить</button>
+	<div class="row gap-15 center right">
+		{#if !$screen}
+			<a href="/users/{profile.username}">Отменить</a>
+		{/if}
+		<button class="button" {disabled} type="submit">Предложить</button>
+	</div>
 </form>

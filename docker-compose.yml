@@ -13,6 +13,7 @@ services:
       context: ./pb
     volumes:
       - ./pb/pb_data:/pb/pb_data
+      - ./pb/pb_hooks:/pb/pb_hooks
       - ./pb/pb_migrations:/pb/pb_migrations
 
   nginx:

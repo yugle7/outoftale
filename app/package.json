@@ -24,6 +24,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"pocketbase": "^0.21.1"
+		"dotenv": "^16.4.5",
+		"pocketbase": "^0.22.0"
 	}
 }

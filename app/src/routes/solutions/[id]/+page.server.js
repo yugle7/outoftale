@@ -1,4 +1,4 @@
-import { addId, getAuthor, getSolution, role_rating } from "$lib";
+import { addId, getAuthor, getSolution } from "$lib";
 import { solution_progress } from "../data";
 
 async function loadReacts(pb, talk_id) {
@@ -98,11 +98,10 @@ export async function load({ parent, url, locals }) {
     const profile = pb.authStore.model;
 
     if (!profile) throw redirect('/login');
-
-    const type = +url.searchParams.get('type');
-    if (type !== 7) return {};
+    if (url.searchParams.get('type') !== '7') return {};
 
     const { solution, problem } = await parent();
+    if (!solution || !problem) return {};
 
     const chat = await loadChat(pb, solution, problem)
     const talk = await loadTalk(pb, profile.id, chat.id);
@@ -147,7 +146,7 @@ export const actions = {
 
             if (progress === 5 && solution.progress !== 5) {
                 res = await pb.collection('users').update(author_id, { 'rating+': weight });
-                if (res.role === 0 && res.rating > role_rating[1]) user.role = 1;
+                if (res.role === 0 && res.rating > 5) user.role = 1;
 
                 for (let i = 1; i <= weight; i++) {
                     const id = String(res.rating - i).padStart(15, '0');

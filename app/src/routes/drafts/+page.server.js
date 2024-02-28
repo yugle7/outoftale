@@ -1,3 +1,5 @@
+import { addId } from '$lib';
+import { redirect } from '@sveltejs/kit';
 import { default_params } from './data';
 
 async function loadReacts(pb, profile) {
@@ -26,16 +28,17 @@ async function loadDrafts(pb, profile, params) {
     });
     const drafts = res.items;
 
-    if (profile) {
-        const reacts = await loadReacts(pb, profile);
-        if (reacts) drafts.forEach(d => (d.react = reacts[d.id]));
-    }
+    const reacts = await loadReacts(pb, profile);
+    if (reacts) drafts.forEach(d => (d.react = reacts[d.id]));
+    
     return drafts;
 }
 
 export async function load({ locals, url }) {
     const pb = locals.pb;
+    
     const profile = pb.authStore.model;
+    if (!profile) throw redirect('/login');
 
     const params = { ...default_params };
     for (const key of ['sort', 'category', 'editor_id', 'problem_id']) {

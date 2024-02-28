@@ -72,7 +72,7 @@
 		$look = null;
 
 		m.scrollIntoView();
-	
+
 		m.classList.add('look');
 		setTimeout(() => m.classList.remove('look'), 4000);
 	}
@@ -114,7 +114,7 @@
 		{/if}
 		{#if !message.deleted}
 			<li id={message.id} class:highlighted={() => is_sender && i >= chat.read}>
-				<Message {talk} {message} {profile} />
+				<Message {message} {profile} />
 			</li>
 		{/if}
 	{/each}

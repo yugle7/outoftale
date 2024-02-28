@@ -13,14 +13,13 @@
 	let output;
 
 	export let chat;
+	export let profile;
 
 	let message;
 	let edited;
 
 	let text = '';
 	let sent = 0;
-
-	export let profile;
 
 	let disabled = true;
 

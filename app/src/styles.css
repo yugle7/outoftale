@@ -59,7 +59,7 @@ html {
 body {
 	min-height: 100dvh;
 	color: var(--color-100);
-	font-size: 18px;
+	font-size: 20px;
 }
 
 /* link */
@@ -670,11 +670,6 @@ input:empty:before {
 }
 
 .label {
-	color: var(--color-75);
-	font-size: 14px;
-}
-
-.status {
 	color: var(--color-75);
 	font-size: 14px;
 }

@@ -1,6 +1,6 @@
 <script>
 	import { enhance, applyAction } from '$app/forms';
-	import { pb, screen, member_became } from '$lib';
+	import { pb, screen } from '$lib';
 
 	import { onDestroy, onMount } from 'svelte';
 	import { show, look, down, find } from './data';
@@ -67,6 +67,7 @@
 					record.deleted = null;
 				}
 				const k = messages.findIndex((m) => m.id === record.id);
+				record.date = messages[k].date;
 				messages[k] = record;
 			}
 			$show = true;
@@ -111,7 +112,7 @@
 
 		{#if profile}
 			{#if !profile.role && (chat.type || talk.user.username !== 'support')}
-				<a href="/discussions/{member_became}" target="_self" class="footer center link padding-10">
+				<a href="/discussions/000000000000000" target="_self" class="footer center link padding-10">
 					Стать участником
 				</a>
 			{:else if talk.deleted}
@@ -124,7 +125,7 @@
 					</button>
 				</form>
 			{:else}
-				<Send {talk} {chat} {profile} />
+				<Send {chat} {profile} />
 			{/if}
 		{:else}
 			<a href="/login" class="footer center link padding-10">Войти</a>

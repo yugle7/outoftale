@@ -5,23 +5,26 @@
 	export let labels;
 	export let title;
 
-	let selected = $params[key] != null;
+	let value = $params[key];
+	$: $params[key] = value;
+
+	let selected = value != null;
 </script>
 
 {#if selected}
 	<button class="link font-14" on:click|preventDefault={() => (selected = false)}>
-		{labels[$params[key]]}
+		{labels[value]}
 	</button>
 {:else}
 	<div class="col gap-10">
 		<button class="link font-14" on:click|preventDefault={() => (selected = true)}>{title}</button>
 		{#each Object.entries(labels) as [v, label] (v)}
-			<label class="link" class:selected={$params[key] == v}>
+			<label class="link" class:selected={value == v}>
 				<input
 					type="radio"
 					name={key}
 					value={v}
-					bind:group={$params[key]}
+					bind:group={value}
 					on:change={() => (selected = true)}
 				/>
 				{label}

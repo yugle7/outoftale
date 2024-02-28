@@ -1,6 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
-	import { params } from '$lib';
+	import { params, screen } from '$lib';
 
 	import Radio from '$lib/edit/Radio.svelte';
 	import Text from '$lib/edit/Text.svelte';
@@ -15,14 +15,21 @@
 	$: disabled = ['title', 'topic', 'text'].some((k) => !$params[k]);
 </script>
 
-<Close {profile} />
+{#if $screen}
+	<Close {profile} />
+{/if}
 
 <form method="post" class="col padding-20 gap-30 content-900" use:enhance>
 	<Text key="title" title="Заголовок" />
-	
+
 	<Radio key="topic" title="Раздел" labels={discussion_topic} />
-	
+
 	<Text key="text" title="Описание" />
 
-	<button class="button right" {disabled} type="submit">Создать</button>
+	<div class="row gap-15 center right">
+		{#if !$screen}
+			<a href="/users/{profile.username}">Отменить</a>
+		{/if}
+		<button class="button" {disabled} type="submit">Создать</button>
+	</div>
 </form>

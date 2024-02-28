@@ -1,4 +1,5 @@
-import { addId, getProblem } from '../../lib/index.js';
+import { addId, getProblem } from '$lib';
+import { redirect } from '@sveltejs/kit';
 import { default_params } from './data';
 
 async function loadProblems(pb, profile, params) {
@@ -65,7 +66,9 @@ async function loadSolutions(pb, profile, params) {
 
 export async function load({ locals, url }) {
     const pb = locals.pb;
+    
     const profile = pb.authStore.model;
+    if (!profile) throw redirect('/login');
 
     const params = { ...default_params };
     for (const key of ['sort', 'weight', 'category', 'progress', 'status', 'author_id', 'problem_id', 'reviewer_id']) {

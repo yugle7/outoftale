@@ -69,7 +69,7 @@ export function getStatuses(profile, problem) {
         case 0:
             return answer || proof ? [1] : [];
         case 1:
-            return [0, 2, 3, 4];
+            return role >= 2 ? [0, 2, 3, 4] : [0, 2, 3];
         case 2:
         case 3:
             return [1];

@@ -41,11 +41,11 @@ async function loadMessages(pb, chat_id) {
     });
 }
 
-async function loadChat(pb, profile_id, problem, type) {
+async function loadChat(pb, profile, problem, type) {
     const { title } = problem;
     let chat;
 
-    let id = type === 6 ? profile_id : String(type).repeat(15);
+    let id = type === 6 ? profile.id : String(type).repeat(15);
     id = addId(problem.id, id);
 
     try {
@@ -69,34 +69,36 @@ const types = [2, 3, 4, 5, 6];
 
 export async function load({ parent, url, locals }) {
     const pb = locals.pb;
-    const profile = pb.authStore.model;
 
     const type = +url.searchParams.get('type');
     if (!types.includes(type)) return {};
 
-    const { problem } = await parent();
-    const chat = await loadChat(pb, profile.id, problem, type)
+    const profile = pb.authStore.model;
+    if (type === 6 && !profile) return {};
 
+    const { problem } = await parent();
+    if (!problem) return {};
+
+    const chat = await loadChat(pb, profile, problem, type)
     if (!profile) return { chat };
 
     const talk = await loadTalk(pb, profile.id, chat.id);
     return { chat, talk }
 }
 
-const sendMessage = async (pb, solution, step) => {
-    if (!step) await createTalk(pb, solution);
+const sendMessage = async (pb, problem, solution, step) => {
+    if (!step) await createTalk(pb, problem, solution);
     updateTalk(pb, solution);
 }
 
-const createTalk = async (pb, solution) => {
-    const { id, problem, author_id } = solution;
-    const { title } = problem;
+const createTalk = async (pb, problem, solution) => {
+    const { id, author_id } = solution;
 
     try {
         await pb.collection('chats').create({
             id,
             type: 6,
-            title
+            title: problem.title
         });
     } catch (err) {
         console.log(err.message);
@@ -123,14 +125,14 @@ const updateTalk = async (pb, solution) => {
             author,
             chat_id: solution.id
         });
-    
+
         res = await pb.collection('chats').update(solution.id, {
             'sent+': 1,
             sender_id: author_id,
             message: { text, author, message_id: res.id },
             changed: res.updated
         });
-    
+
         const id = addId(author_id, solution.id);
         await pb.collection('talks').update(id, {
             read: res.sent,
@@ -147,61 +149,68 @@ export const actions = {
         const pb = locals.pb;
         const profile = pb.authStore.model;
 
-        const data = await request.formData();
-        const action = data.get('action');
-
         const problem_id = params.id;
+        const data = await request.formData();
 
-        let problem = {
+        const categories = data.getAll('categories');
+        if (categories.length === 0) return;
+
+        const action = data.get('action');
+        const applied = action === 'update';
+
+        const problem = {
             title: data.get('title'),
             condition: data.get('condition'),
+            categories,
             notes: data.get('notes') || null,
-            categories: data.getAll('categories'),
             answer: data.get('answer') || null,
             proof: data.get('proof') || null,
             changed: new Date()
         }
+
         const draft = {
             ...problem,
             problem_id,
             editor_id: profile.id,
-            editor: getAuthor(profile)
+            editor: getAuthor(profile),
+            applied
         }
+        const { id } = await pb.collection('drafts').create(draft);
+        const res = await pb.collection('problems').getOne(problem_id);
 
-        let res = await pb.collection('problems').getOne(problem_id);
-
-        if (action === 'update') {
+        try {
+            await pb.collection('edits').create({
+                profile_id: profile.id,
+                action,
+                draft_id: id,
+                draft: getDraft(draft),
+                problem_id,
+                problem: getDraft(res)
+            });
+        } catch (err) {
+            console.log(err.message);
+        }
+        if (applied) {
             await pb.collection('problems').update(problem_id, problem);
-            draft.applied = true;
+        } else {
+            await pb.collection('problems').update(problem_id, { 'drafts+': 1 });
+            await pb.collection('users').update(profile.id, { 'drafts+': 1 });
+            
+            redirect(303, `/drafts/${id}`);
         }
-        problem = getDraft(res);
-
-        res = await pb.collection('drafts').create(draft);
-
-        await pb.collection('edits').create({
-            profile_id: profile.id,
-            draft_id: res.id,
-            draft: getDraft(res),
-            problem_id,
-            problem,
-            action
-        });
-
-        if (action === 'create') redirect(303, `/drafts/${res.id}`);
     },
     progress: async ({ request, params, locals }) => {
         const pb = locals.pb;
         const profile = pb.authStore.model;
 
-        const problem_id = params.id;
-        const id = addId(profile.id, problem_id);
+        const problem = await pb.collection('problems').getOne(params.id);
 
-        let res = await pb.collection('solutions').getOne(id);
-        const { author_id, problem, progress, step } = res;
+        const id = addId(profile.id, problem.id);
+        const { author_id, progress, step } = await pb.collection('solutions').getOne(id);
 
         const data = await request.formData();
 
-        const solution = {
+        let solution = {
             progress: +data.get('progress'),
             'step+': (progress === 0 || progress === 3 || progress === 4) - (progress === 5),
             changed: new Date()
@@ -212,20 +221,20 @@ export const actions = {
         const proof = data.get('proof');
         if (proof != null) solution.proof = proof;
 
-        res = await pb.collection('solutions').update(id, solution);
+        solution = await pb.collection('solutions').update(id, solution);
         const actions = [];
 
-        if (res.progress !== progress) {
-            actions.push(sendMessage(pb, res, step));
+        if (solution.progress !== progress) {
+            actions.push(sendMessage(pb, problem, solution, step));
 
             if (!step) {
                 actions.push(pb.collection('users').update(profile.id, { 'solutions+': 1 }));
-                actions.push(pb.collection('problems').update(problem_id, { 'solutions+': 1 }));
+                actions.push(pb.collection('problems').update(problem.id, { 'solutions+': 1 }));
             }
         }
 
-        if (progress === 5 && res.progress !== 5 && problem.weight > 0) {
-            res = await pb.collection('users').update(author_id, { 'rating-': problem.weight });
+        if (progress === 5 && solution.progress !== 5 && problem.weight > 0) {
+            const res = await pb.collection('users').update(author_id, { 'rating-': problem.weight });
 
             for (let i = 1; i <= problem.weight; i++) {
                 const id = String(res.rating + i).padStart(15, '0');
@@ -238,7 +247,8 @@ export const actions = {
         const pb = locals.pb;
 
         const data = await request.formData();
+        const status = +data.get('status');
 
-        await pb.collection('problems').update(params.id, { status: +data.get('status') });
+        await pb.collection('problems').update(params.id, { status });
     }
 }
